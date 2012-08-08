@@ -1,0 +1,3 @@
+These are the sources for a small tool that reads midi files (or .kar-files) and extracts any lyrics from them.
+
+This application is a demonstration of a midi-file parser written using boost.spirit (spirit 2.x).    
