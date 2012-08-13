@@ -8,39 +8,42 @@
 
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
 #include <exception>
+#include <iomanip> // for setiosflags, setw
 
 #include "midilib/include/midi_parser.hpp"
 #include "midilib/include/midi_multiplexer.hpp"
 #include "midilib/include/timed_midi_visitor.hpp"
 ///
-/// This class extracts text events from a midi-file and adds the text to a songtext
-/// object at the right instances.
+/// This class only reacts on meta events. If the meta event is of type "text" (0x01)
+/// then it will print the data of the event to the given output stream.
+/// backward- and forward slashes will be converted to newlines.
+/// texts that start with @ will be ignored.
 ///
-struct print_text_visitor: public events::visitor<print_text_visitor>
+struct print_text_visitor: public events::timed_visitor<print_text_visitor>
 {
-    typedef events::visitor< print_text_visitor> parent;
+    typedef events::timed_visitor< print_text_visitor> parent;
     using parent::operator();
 
-    print_text_visitor( std::ostream &output)
-        : output(output)
+    print_text_visitor( std::ostream &output, midi_header &header)
+        : output(output), parent( header)
     {
     }
 
     void operator()( const events::meta &event)
     {
+        using namespace std;
         // is it a text event?
         // we're ignoring lyrics (0x05) events, because text events have more
         // information (like 'start of new line')
         if (event.type == 0x01)
         {
-            std::string event_text( event.bytes.begin(), event.bytes.end());
+            string event_text( event.bytes.begin(), event.bytes.end());
             if (event_text.size() > 0 && event_text[0] != '@')
             {
                 if (event_text[0] == '/' || event_text[0] == '\\')
                 {
-                    output << "\n";
+                    output << "\n" << setiosflags( ios::right) << setprecision(2) << fixed << setw( 6) << get_current_time() << '\t';
                     output << event_text.substr( 1);
                 }
                 else
@@ -85,7 +88,7 @@ int main( int argc, char *argv[])
         midi_multiplexer multiplexer( midi.tracks);
 
         // now print all lyrics in the midi file by sending a print_text_visitor into the data structure.
-        multiplexer.accept( print_text_visitor( cout));
+        multiplexer.accept( print_text_visitor( cout, midi.header));
     }
     catch (const exception &e)
     {

@@ -19,7 +19,7 @@
 #include <boost/spirit/include/qi_binary.hpp>
 
 #include "include/midi_parser.hpp"
-#include "subrange_parser.hpp"
+#include "next_directive.hpp"
 #include "midi_events_fusion.hpp"
 #include "midi_file_fusion.hpp"
 
@@ -57,7 +57,7 @@ struct midi_parser: grammar< Iterator, midi_file()>
         // timed midi events. The subrange directive is used to limit the parsing to only those bytes
         // that fall within the chunk (-size).
         track
-            %= lit("MTrk") >>  omit[ big_dword[_a = _1]] >> subrange(_a)[+timed_event]
+            %= lit("MTrk") >>  omit[ big_dword[_a = _1]] >> next(_a)[+timed_event]
             ;
 
         // a 'timed event' consist of a time stamp (the time between this event and the previous one) and a midi event

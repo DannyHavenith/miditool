@@ -6,12 +6,12 @@
 //  http://www.boost.org/LICENSE_1_0.txt)
 //
 
-// Subrange parser
+// next-directive
 // This file defines a spirit (2.x) directive that limits a parser to parse only a given number of input tokens
 //
 
-#ifndef SUBRANGE_PARSER_HPP_INCLUDED
-#define SUBRANGE_PARSER_HPP_INCLUDED
+#ifndef NEXT_DIRECTIVE_HPP_INCLUDED
+#define NEXT_DIRECTIVE_HPP_INCLUDED
 
 #include <boost/spirit/home/support/info.hpp>
 #include <boost/spirit/home/qi/meta_compiler.hpp>
@@ -24,37 +24,37 @@
 #include <iterator> // for std::advance
 
 
-namespace subrange_directive
+namespace next_directive
 {
-    BOOST_SPIRIT_TERMINAL_EX( subrange)
+    BOOST_SPIRIT_TERMINAL_EX( next)
 }
-using subrange_directive::subrange;
+using next_directive::next;
 
 // plug our parser into the spirit metagrammar.
 namespace boost { namespace spirit 
 {
     
-    // enable subrange(size)[p]
+    // enable next(size)[p]
     template< typename T>
     struct use_directive<
         qi::domain,
         terminal_ex< 
-            subrange_directive::tag::subrange,
+            next_directive::tag::next,
             fusion::vector1<T>
         >
     > : mpl::true_ {};
 
-    // enable *lazy* subrange(size)[p]
+    // enable *lazy* next(size)[p]
     template <>                                     
     struct use_lazy_directive<
         qi::domain,
-        subrange_directive::tag::subrange,
+        next_directive::tag::next,
         1 // arity
     > : mpl::true_ {};
 
 }} // end namespace boost::spirit
 
-namespace subrange_directive
+namespace next_directive
 {
 
     using namespace ::boost::spirit::qi;
@@ -67,8 +67,8 @@ namespace subrange_directive
     ///    subrange(chunk_size)[*midi_event]
     /// in this particular case this would parse the next 'chunk_size' bytes as a sequence of midi_events
     template< typename Subject>
-    struct subrange_parser
-        :unary_parser< subrange_parser<Subject> >
+    struct next_parser
+        :unary_parser< next_parser<Subject> >
     {
         /// subject_type is the type of the parser we're enclosing
         typedef Subject subject_type;
@@ -83,7 +83,7 @@ namespace subrange_directive
                     type;
         };
 
-        subrange_parser( Subject const &sub, ptrdiff_t off)
+        next_parser( Subject const &sub, ptrdiff_t off)
             : subject( sub), offset(off) {};
 
         template <
@@ -115,7 +115,7 @@ namespace subrange_directive
         template <typename Context>
         info what(Context const& ctx)
         {
-            return info( "subrange", subject.what( ctx));
+            return info( "next", subject.what( ctx));
         }
 
         Subject           subject;
@@ -131,13 +131,13 @@ namespace boost { namespace spirit {
         template< typename T, typename Subject, typename Modifiers>
         struct make_directive<
                 terminal_ex<
-                        subrange_directive::tag::subrange, 
+                        next_directive::tag::next,
                         fusion::vector1<T> 
                     >,
                 Subject, Modifiers
                 >
         {
-            typedef subrange_directive::subrange_parser< Subject> result_type;
+            typedef next_directive::next_parser< Subject> result_type;
             template< typename Terminal>
             result_type operator()(
                 Terminal const &term, Subject const &subject, unused_type) const
@@ -148,14 +148,14 @@ namespace boost { namespace spirit {
     }
 
     namespace traits {
-    	/// A subrange parser has a semantic action if the enclosed parser has one.
+    	/// A 'next' parser has a semantic action if the enclosed parser has one.
         template< typename Subject>
-        struct has_semantic_action< subrange_directive::subrange_parser< Subject> >
+        struct has_semantic_action< next_directive::next_parser< Subject> >
             : unary_has_semantic_action< Subject> {};
 
         template< typename Subject, typename Attribute, typename Context, typename Iterator>
         struct handles_container<
-            subrange_directive::subrange_parser< Subject>,
+            next_directive::next_parser< Subject>,
             Attribute, Context, Iterator
                     >
             :unary_handles_container< Subject, Attribute, Context, Iterator> {};
@@ -163,4 +163,4 @@ namespace boost { namespace spirit {
     }
 
 }}
-#endif // SUBRANGE_PARSER_HPP_INCLUDED
+#endif // NEXT_DIRECTIVE_HPP_INCLUDED
