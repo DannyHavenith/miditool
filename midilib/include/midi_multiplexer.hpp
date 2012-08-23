@@ -20,61 +20,61 @@ class midi_multiplexer
 
 public:
     typedef midi_file::tracks_type     tracks_type;
-	midi_multiplexer( const tracks_type &tracks)
-	{
-		for (tracks_type::const_iterator i = tracks.begin(); i != tracks.end();++i)
-		{
-			if (i->begin() != i->end())
-			{
-				ranges.push_back( track_range( i->begin(), i->end()));
-			}
-		}
-	}
+    midi_multiplexer( const tracks_type &tracks)
+    {
+        for (tracks_type::const_iterator i = tracks.begin(); i != tracks.end();++i)
+        {
+            if (i->begin() != i->end())
+            {
+                ranges.push_back( track_range( i->begin(), i->end()));
+            }
+        }
+    }
 
-	/// accept any visitor of timed_midi_events.
-	/// This visitor will be provided with all events in all of the tracks in chronological order.
-	/// All events in any given track that happen simultaneous (with zero time interval) will be offered consecutively.
-	void accept( boost::function< void ( const events::timed_midi_event &)> v)
-	{
-		while (!ranges.empty())
-		{
-			// find the range with the earliest event
-			ranges_vector::iterator 
-				earliest = find_earliest();
+    /// accept any visitor of timed_midi_events.
+    /// This visitor will be provided with all events in all of the tracks in chronological order.
+    /// All events in any given track that happen simultaneous (with zero time interval) will be offered consecutively.
+    void accept( boost::function< void ( const events::timed_midi_event &)> v)
+    {
+        while (!ranges.empty())
+        {
+            // find the range with the earliest event
+            ranges_vector::iterator 
+                earliest = find_earliest();
 
-			// invoke the visitor with the next event
-			events::timed_midi_event e = *earliest->begin;
-			e.delta_time = earliest->time();
+            // invoke the visitor with the next event
+            events::timed_midi_event e = *earliest->begin;
+            e.delta_time = earliest->time();
 
-			v( e);
-			
-			// now adapt all other midi event delta times.
-			adapt_offsets( earliest->time());
+            v( e);
+            
+            // now adapt all other midi event delta times.
+            adapt_offsets( earliest->time());
 
-			++earliest->begin;
-			earliest->offset = 0;
+            ++earliest->begin;
+            earliest->offset = 0;
 
 
-			// while the range is not empty and there are events in this track that are simultaneous
-			// give all these events to the visitor. This keeps simultaneous events in one track 
-			// together.
-			while (
-					!earliest->empty()
-				&&	earliest->begin->delta_time == 0)
-			{
-				v( *earliest->begin);
-				++earliest->begin;
-			}
+            // while the range is not empty and there are events in this track that are simultaneous
+            // give all these events to the visitor. This keeps simultaneous events in one track 
+            // together.
+            while (
+                    !earliest->empty()
+                &&    earliest->begin->delta_time == 0)
+            {
+                v( *earliest->begin);
+                ++earliest->begin;
+            }
 
-			// remove the track if we've exhausted all events.
-			if (earliest->empty())
-			{
-				ranges.erase( earliest);
-			}
-		}
-		
+            // remove the track if we've exhausted all events.
+            if (earliest->empty())
+            {
+                ranges.erase( earliest);
+            }
+        }
+        
 
-	}
+    }
 
 private:
     typedef midi_track::const_iterator track_iterator;
@@ -135,7 +135,7 @@ private:
         }
     }
 
-	ranges_vector	ranges;
+    ranges_vector    ranges;
 };
 
 #endif //MIDI_MULTIPLEXER_HPP

@@ -31,7 +31,7 @@ namespace events
     struct note_aftertouch : note
     {};
 
-    struct controller 
+    struct controller
     {
         unsigned char which;
         unsigned char value;
@@ -39,25 +39,25 @@ namespace events
 
     struct program_change
     {
-    	explicit program_change( unsigned char program)
-    		:program( program){}
-    	program_change(){}
+        explicit program_change( unsigned char program)
+            :program( program){}
+        program_change(){}
         unsigned char program;
     };
 
     struct channel_aftertouch
     {
-    	explicit channel_aftertouch( unsigned char value)
-    		:value( value){}
-    	channel_aftertouch(){}
+        explicit channel_aftertouch( unsigned char value)
+            :value( value){}
+        channel_aftertouch(){}
         unsigned char value;
     };
 
     struct pitch_bend
     {
-    	explicit pitch_bend( unsigned short value)
-    		:value(value){}
-    	pitch_bend(){}
+        explicit pitch_bend( unsigned short value)
+            :value(value){}
+        pitch_bend(){}
         unsigned short value;
     };
 
@@ -95,13 +95,13 @@ namespace events
         meta,
         sysex,
         channel_event
-    > any;
+    > midi_event;
 
     /// a timed midi event consists of a time stamp, which holds the time between this event and the previous, followed by a midi event.
     struct timed_midi_event
     {
         unsigned delta_time;
-        events::any event;
+        midi_event event;
     };
 } // namespace events
 

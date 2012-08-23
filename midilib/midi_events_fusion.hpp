@@ -67,7 +67,7 @@ BOOST_FUSION_ADAPT_STRUCT(
 BOOST_FUSION_ADAPT_STRUCT(
     events::timed_midi_event,
     (unsigned, delta_time)
-    (events::any, event)
+    (events::midi_event, event)
     )
 
 #endif //MIDI_EVENTS_FUSION_HPP

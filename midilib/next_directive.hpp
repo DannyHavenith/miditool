@@ -30,7 +30,7 @@ namespace next_directive
 }
 using next_directive::next;
 
-// plug our parser into the spirit metagrammar.
+// plug our parser into the spirit meta-grammar.
 namespace boost { namespace spirit 
 {
     
@@ -60,11 +60,11 @@ namespace next_directive
     using namespace ::boost::spirit::qi;
 
 
-    /// Subrange parser.
+    /// "next" parser.
     /// This parser (directive) is used to limit a parser p to only the next n input tokens
-    /// Usage is like this: subrange(n)[p]
+    /// Usage is like this: next(n)[p]
     /// An example of its use is in a--binary--midi chunk parser where it would be used like this:
-    ///    subrange(chunk_size)[*midi_event]
+    ///    next(chunk_size)[*midi_event]
     /// in this particular case this would parse the next 'chunk_size' bytes as a sequence of midi_events
     template< typename Subject>
     struct next_parser
@@ -148,7 +148,7 @@ namespace boost { namespace spirit {
     }
 
     namespace traits {
-    	/// A 'next' parser has a semantic action if the enclosed parser has one.
+        /// A 'next' parser has a semantic action if the enclosed parser has one.
         template< typename Subject>
         struct has_semantic_action< next_directive::next_parser< Subject> >
             : unary_has_semantic_action< Subject> {};

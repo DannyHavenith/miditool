@@ -30,7 +30,7 @@ using namespace boost::spirit;
 using namespace boost::spirit::qi;
 
 /// Grammar for midi files.
-/// In boost.spirit, grammars happen to be parsers as well, hence the name 'midi_parser'.
+/// This grammar can be used to parse midi files. It generates a midi_file struct from the contents of the file.
 template<typename Iterator>
 struct midi_parser: grammar< Iterator, midi_file()>
 {
@@ -75,9 +75,9 @@ struct midi_parser: grammar< Iterator, midi_file()>
             %= omit[char_('\xff')] >> byte_ >> omit[variable_length_quantity[ _a = _1]] >> repeat(_a)[byte_]
             ;
 
-        // a sysex event starts with 0xF7 or 0xFE, followed by a size, followed by the indicated amount of bytes.
+        // a sysex event starts with 0xF7 or 0xF0, followed by a size, followed by the indicated amount of bytes.
         sysex_event
-            = (char_('\xfe') | char_('\xf7')) >> variable_length_quantity[ _a = _1] >> repeat(_a)[byte_]
+            = (char_('\xf0') | char_('\xf7')) >> variable_length_quantity[ _a = _1] >> repeat(_a)[byte_]
             ;
 
         // a variable length quantity consist of zero or more bytes with the high bit set, followed by a single byte with a zero most significant bit.
@@ -158,7 +158,7 @@ struct midi_parser: grammar< Iterator, midi_file()>
     rule<Iterator, midi_header()        >           header;
     rule<Iterator, midi_track(size_t)   >           track_data;
     rule<Iterator, events::timed_midi_event()>      timed_event;
-    rule<Iterator, events::any()        >           event;
+    rule<Iterator, events::midi_event()        >           event;
     rule<Iterator, events::pitch_bend() >           pitch_bend_event;
     rule<Iterator, size_t()             >           variable_length_quantity;
     rule<Iterator, events::note_off()       >       note_off_event;

@@ -28,7 +28,7 @@ struct midi_header
 /// In-memory representation of the information found in a midi file.
 struct midi_file
 {
-	typedef std::vector<midi_track> tracks_type;
+    typedef std::vector<midi_track> tracks_type;
     midi_header header;
     tracks_type tracks;
 };
