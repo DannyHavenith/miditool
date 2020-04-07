@@ -24,8 +24,6 @@
 #include "midi_file_fusion.hpp"
 
 
-using namespace std;
-using namespace boost::phoenix;
 using namespace boost::spirit;
 using namespace boost::spirit::qi;
 
@@ -41,6 +39,7 @@ struct midi_parser: grammar< Iterator, midi_file()>
         using boost::spirit::ascii::char_;
         using boost::phoenix::ref;
         using boost::phoenix::at_c;
+        using boost::spirit::qi::rule;
 
         // a midi file consists of a header chunk followed by zero or more track chunks
         file
@@ -181,7 +180,7 @@ bool parse_midifile( std::istream &in, midi_file &result)
     result.tracks.clear();
 
     // don't skip whitespaces.
-    in.unsetf( ios_base::skipws);
+    in.unsetf( std::ios_base::skipws);
 
     // copy the whole file into a string.
     typedef std::istreambuf_iterator<char> base_iterator;
